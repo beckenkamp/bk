@@ -77,6 +77,13 @@
     .demo-header .mdl-layout__header-row {
       padding-left: 40px;
     }
+    .demo-layout.is-small-screen .demo-header .mdl-layout__header-row {
+      padding-left: 20px;
+    }
+
+    .demo-layout.is-small-screen .mdl-layout-title {
+      font-size: 12px;
+    }
 
     .demo-container {
       max-width: 1600px;
@@ -86,13 +93,13 @@
 
     .demo-content {
       border-radius: 2px;
-      padding: 80px 56px;
-      margin-bottom: 80px;
+      padding: 5px 5px;
+      margin-bottom: 10px;
     }
 
-    .demo-layout.is-small-screen .demo-content {
+    /*.demo-layout.is-small-screen .demo-content {
       padding: 40px 28px;
-    }
+    }*/
 
     .demo-content h3 {
       margin-top: 48px;
@@ -111,6 +118,10 @@
     #chat-screen {
       max-height: 350px;
       overflow: auto;
+    }
+
+    .demo-layout.is-small-screen #chat-screen {
+      max-height: 270px;
     }
 
     form .mdl-button--icon {
@@ -159,27 +170,33 @@
 
     /* CARD */
     .demo-card-square.mdl-card {
-      width: 275px;
-      height: auto;
+      width: 256px;
+      margin-left: 20px;
+      display: inline-block;
     }
     .mdl-card__title-text {
       z-index: 1;
+      font-size: 18px;
     }
     .demo-card-square > .mdl-card__title {
-      height: 120px;
+      height: 130px;
       color: #fff;
       background:
         url('https://cdn-images-1.medium.com/max/800/1*wpbaB_3ERWyl47-XdNleAg.jpeg') bottom right 15% no-repeat #46B6AC;
     }
     .demo-card-square > .mdl-card__title:before {
       background-color: black;
-      height: 120px;
+      height: 130px;
       width: 100%;
       content: "";
       opacity: 0.7;
       position: absolute;
       display: block;
       left: 0;
+    }
+    .demo-card-square > .mdl-card__supporting-text {
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .mdl-chip {
@@ -188,10 +205,11 @@
 
     .demo-card-event.mdl-card {
       width: 256px;
-      height: 150px;
+      min-height: 240px;
       background: #3E4EB8;
       margin-bottom: 6px;
       margin-left: 20px;
+      display: inline-block;
     }
     .demo-card-event > .mdl-card__actions {
       border-color: rgba(255, 255, 255, 0.2);
@@ -214,6 +232,59 @@
     .demo-card-event > .mdl-card__actions,
     .demo-card-event > .mdl-card__actions > .mdl-button {
       color: #fff;
+    }
+
+    .full-card-wrapper {
+      width: 100%;
+      height: 250px;
+      overflow: scroll;
+    }
+    .full-card {
+      width: calc(280px * 6);
+    }
+
+    .chat-message {
+      float: left;
+      text-align: left;
+      width: 90%;
+      margin: 0px 20px 5px 20px;
+      display: table-row;
+    }
+    .chat-wrapper {
+      width: 100%;
+      display: table-cell;
+    }
+    .chat-message-text {
+      background-color: lightblue;
+      max-width: 70%;
+      float: left;
+      font-size: 11pt;
+      line-height: 1;
+      padding: 10px;
+      margin: 0 10px;
+      border-radius: 10px 10px 10px 0;
+    }
+    .chat-me .chat-message-text {
+      background-color: lightgray;
+      float: right;
+      border-radius: 10px 10px 0 10px;
+    }
+    .chat-message-profile {
+      display: table-cell;
+      vertical-align: bottom;
+    }
+    .chat-message .profile-pic img {
+      width: 40px;
+      height: 40px;
+      margin-bottom: 0;
+    }
+    .profile-pic img {
+      margin-right: 10px;
+      width: 100px;
+      height: 100px;
+    }
+    .img-circle {
+      border-radius: 50%;
     }
 
     </style>
@@ -248,18 +319,6 @@
 
             <div id="chat-screen" class="demo-list-action mdl-list">
 
-              <div class="mdl-list__item right-item">
-                <span class="mdl-list__item-primary-content">
-                  <span class="text-right">
-                    Bem-vindo! Eu sou o BK, o robô assistente do Marcus.
-                    Para começar você pode digitar "menu"...
-
-                    <br><br>Essa conversa se auto-destruirá assim que o navegador for fechado! D=
-                  </span>
-                  <div class="icon-avatar"></div>
-                </span>
-              </div>
-
             </div>
 
             <div id="loading" class="mdl-progress mdl-js-progress mdl-progress__indeterminate" style="display:none;"></div>
@@ -272,7 +331,7 @@
                     <label class="mdl-textfield__label" for="user-message">Diga alguma coisa</label>
                   </div>
                 </div>
-                <div class="mdl-cell mdl-cell--2-col mdl-cell--2-col-tablet">
+                <div class="mdl-cell mdl-cell--2-col mdl-cell--2-col-tablet mdl-cell--hide-phone">
                   <button type="submit" class="mdl-button mdl-js-button mdl-button--icon">
                     <i class="material-icons">send</i>
                   </button>
@@ -309,20 +368,30 @@
           $("#loading").show();
       }
 
-      function showChatItem(message) {
+      function showChatItem(message, add_attachment_block) {
         toggleLoadingBar(true);
         setTimeout(function() {
 
           $("#chat-screen").append('' +
-            '<div class="mdl-list__item right-item">' +
-              '<span class="mdl-list__item-primary-content">' +
-                '<span class="text-right">' + message + '</span>' +
-                '<i class="icon-avatar"></i>' +
-              '</span>' +
+            '<div class="chat-message chat-me">' +
+              '<div class="chat-wrapper">' +
+                '<div class="chat-message-text">' + message + '</div>' +
+              '</div>' +
+              '<div class="chat-message-profile chat-me">' + 
+                '<div class="profile-pic">' +
+                  '<div class="profile-pic-img">' +
+                    '<img src="static/android-red-square.png" class="img-circle">' +
+                  '</div>' +
+                '</div>' +
+              '</div>' +
             '</div>');
 
-            doScrollBottom();
-            toggleLoadingBar(false);
+          if (add_attachment_block !== undefined) {
+            $("#chat-screen").append('<div class="full-card-wrapper"><div class="full-card"></div></div>');
+          }
+
+          doScrollBottom();
+          toggleLoadingBar(false);
         }, 1000);
       }
 
@@ -331,23 +400,19 @@
         var image_url = (data.image_url != '') ? 'style="background-image: url(' + data.image_url + '); background-position: bottom right; background-size: 100%; background-repeat: no-repeat; background-color: #46B6AC;"' : '';
 
         setTimeout(function() {
-          $("#chat-screen").append('' +
-            '<div class="mdl-list__item">' +
-              '<span class="mdl-list__item-primary-content">' +
-                '<div class="demo-card-square mdl-card mdl-shadow--2dp">' +
-                  '<div class="mdl-card__title mdl-card--expand" ' + image_url + '>' +
-                    '<h2 class="mdl-card__title-text">' + data.title + '</h2>' +
-                  '</div>' +
-                  '<div class="mdl-card__supporting-text">' +
-                    data.description +
-                  '</div>' +
-                  '<div class="mdl-card__actions mdl-card--border">' +
-                    '<a href="' + data.link + '" target="_blank" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">' +
-                      'Acessar' +
-                    '</a>' +
-                  '</div>' +
-                '</div>' +
-              '</span>' +
+          $(".full-card:last").append('' +
+            '<div class="demo-card-square mdl-card mdl-shadow--2dp">' +
+              '<div class="mdl-card__title mdl-card--expand" ' + image_url + '>' +
+                '<h2 class="mdl-card__title-text">' + data.title + '</h2>' +
+              '</div>' +
+              '<div class="mdl-card__supporting-text">' +
+                data.description +
+              '</div>' +
+              '<div class="mdl-card__actions mdl-card--border">' +
+                '<a href="' + data.link + '" target="_blank" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">' +
+                  'Acessar' +
+                '</a>' +
+              '</div>' +
             '</div>');
 
           doScrollBottom();
@@ -355,14 +420,26 @@
         }, 1000);
       }
 
+      showChatItem('Bem-vindo ao site do Marcus Beckenkamp!');
+      setTimeout(function() { showChatItem('Eu sou o BK, o robô assistente do Marcus. Para começar você pode digitar "menu"...'); }, 1000);
+      setTimeout(function() { showChatItem('Essa conversa se auto-destruirá assim que o navegador for fechado! D='); }, 2000);
+
       function showButtons(data) {
         toggleLoadingBar(true);
+
         setTimeout(function() {
+          $("#chat-screen").append('<div class="buttons-wrapper mdl-list__item"></div>');
+
           for (var i = 0; i < data.length; i++) {
-            $("#chat-screen").append('' +
-              '<button type="button" class="mdl-chip" onclick="javascript:getResponse(\'' + data[i].intent + '\')">' +
+            if (data[i].intent !== undefined) {
+              var action = 'onclick="javascript:getResponse(\'' + data[i].intent + '\')"';
+            } else {
+              var action = 'href="' + data[i].url + '" target="_blank"';
+            }
+            $(".buttons-wrapper:last").append('' +
+              '<a class="mdl-chip" ' + action + '>' +
                 '<span class="mdl-chip__text">' + data[i].text + '</span>' +
-              '</button>');
+              '</a>');
           }
           doScrollBottom();
           toggleLoadingBar(false);
@@ -376,7 +453,7 @@
         var icon = (data.icon !== undefined) ? data.icon : 'work';
 
         setTimeout(function() {
-          $("#chat-screen").append('' +
+          $(".full-card:last").append('' +
             '<div class="demo-card-event mdl-card mdl-shadow--2dp" ' + bg_color + '>' +
               '<div class="mdl-card__title mdl-card--expand">' +
                 '<h4>' +
@@ -411,12 +488,18 @@
         $("#user-message").val('');
 
         $("#chat-screen").append('' +
-          '<div class="mdl-list__item">' +
-            '<span class="mdl-list__item-primary-content">' +
-              '<i class="material-icons mdl-list__item-avatar">person</i>' +
-              '<span class="text-left">' + message + '</span>' +
-            '</span>' +
-          '</div>');
+            '<div class="chat-message">' +
+              '<div class="chat-message-profile chat-me">' + 
+                '<div class="profile-pic">' +
+                  '<div class="profile-pic-img">' +
+                    '<i class="material-icons mdl-list__item-avatar">person</i>' +
+                  '</div>' +
+                '</div>' +
+              '</div>' +
+              '<div class="chat-wrapper">' +
+                '<div class="chat-message-text">' + message + '</div>' +
+              '</div>' +
+            '</div>');
 
         getResponse(message);
         doScrollBottom();
@@ -428,26 +511,25 @@
         myDiv.animate({ scrollTop: myDiv[0].scrollHeight - myDiv.height() }, 1000);
       }
 
-      //setTimeout(function() { $("#item2").show(); }, 1000);
-      //setTimeout(function() { $("#item3").show(); }, 2000);
-      //setTimeout(function() { $("#item4").show(); }, 3000);
-
       function getResponse(message) {
         /**
          * Function that handles conversation
          */
         var intent = verifyIntent(message);
 
-        if (intent == 'posts') {
+        if (intent == 'links') {
           showChatItem(getRandResponse(intent));
-          for (var i = 2; i >= 0; i--) {
+          showButtons(links_data);
+        } else if (intent == 'posts') {
+          showChatItem(getRandResponse(intent), true);
+          for (var i = 0; i <= 5; i++) {
             showLinkCard(links[i]);
           }
         } else if (intent == 'about') {
           showChatItem(getRandResponse(intent));
           setTimeout(function() { showChatItem(getRandResponse(intent + '1')); }, 2000);
         } else if (intent == 'works') {
-          showChatItem(getRandResponse(intent));
+          showChatItem(getRandResponse(intent), true);
           for (var i = 0; i < works_data.length; i++) {
             showFullCard(works_data[i]);
           }
@@ -483,9 +565,14 @@
               return 'works';
         }
 
+        // If intent is to see links related
+        if (message_lower.indexOf('links') !== -1) {
+          return 'links';
+        }
+            
+
         // If intent is to see last posts
-        if (verifyWord(message_lower, 'link') ||
-            verifyWord(message_lower, 'posts') ||
+        if (verifyWord(message_lower, 'posts') ||
             verifyWord(message_lower, 'publicações') ||
             verifyWord(message_lower, 'publicação') ||
             verifyWord(message_lower, 'texto') ||
@@ -503,7 +590,8 @@
         // If intent to know more
         if (verifyWord(message_lower, 'sobre') ||
             verifyWord(message_lower, 'about') ||
-            verifyWord(message_lower, 'saber mais')) {
+            verifyWord(message_lower, 'saber mais') ||
+            verifyWord(message_lower, 'quem é')) {
               return 'about';
         }
 
@@ -617,7 +705,7 @@
                                    'hahaha, boa',
                                    'muito boa essa hahaha');
 
-      all_responses['about'] = Array('O patrão é desenvolvedor web desde 2002 e tem trabalhado bastante com chatbots ultimamente... ainda bem!',
+      all_responses['about'] = Array('O patrão é desenvolvedor web desde 2002 e tem trabalhado com chatbots ultimamente... ainda bem!',
                                      'Meu boss é desenvolvedor de aplicações para web desde o ínicio dos anos 2000... veião.',
                                      'Quer saber mais sobre o patrão? Bem, ele é desenvolvedor web faz uns 15 anos, eu acho... mas pode chamar o cara de experiente e não de velho, hein! =P');
       all_responses['about1'] = Array('Ele também gosta bastante de escrever e vive postando coisas no seu blog. Se quiser dar uma olhada nos textos digita "artigos" que eu te mostro alguma coisa.',
@@ -628,14 +716,25 @@
                                     'Vamos lá! Escolha uma opção:',
                                     'Esse é nosso menu.');
 
-      all_responses['works'] = Array('Esses são alguns dos trabalhos do patrão...');
+      all_responses['links'] = Array('Aqui estão alguns links relacionados ao Marcus!',
+                                     'Vamos lá! Aqui estão alguns links do Marcus.');
+
+      all_responses['works'] = Array('Esses são alguns dos últimos trabalhos do patrão...');
 
       // MENU ITENS
       var menu_data = new Array();
-      menu_data[0] = {'intent': 'menu', 'text': 'Menu'};
-      menu_data[1] = {'intent': 'posts', 'text': 'Artigos'};
-      menu_data[2] = {'intent': 'about', 'text': 'Sobre'};
-      menu_data[3] = {'intent': 'works', 'text': 'Portfolio'};
+      menu_data.push({'intent': 'menu', 'text': 'Menu'});
+      menu_data.push({'intent': 'posts', 'text': 'Artigos'});
+      menu_data.push({'intent': 'about', 'text': 'Sobre'});
+      menu_data.push({'intent': 'works', 'text': 'Portfolio'});
+      menu_data.push({'intent': 'links', 'text': 'Links'});
+
+      // LINKS
+      var links_data = new Array();
+      links_data.push({'url': 'http://linkedin.com/me/beckenkamp', 'text': 'Linkedin'});
+      links_data.push({'url': 'http://github.com/beckenkamp', 'text': 'Github'});
+      links_data.push({'url': 'http://blog.mbeck.com.br', 'text': 'Blog'});
+      links_data.push({'url': 'http://twitter.com/beckenkamp', 'text': 'Twitter'});
 
       // Portfolio
       var works_data = new Array();
@@ -644,21 +743,41 @@
                        'description': 'O bot do Messenger que ajuda a controlar seu orçamento doméstico!',
                        'href': 'https://www.messenger.com/t/1809835352617288',
                        'bg_color': 'rgb(255,82,82)'};*/
-      works_data[2] = {'title': 'Climão',
+      works_data.push({'title': 'Climão',
                        'button_text': 'Fale com ele',
-                       'description': 'O bot que informa o clima!',
-                       'href': 'https://www.messenger.com/t/climaoweatherbot',
+                       'description': 'O bot que informa o clima! Um experimento de criação de bots para Facebook Messenger.',
+                       'href': 'http://m.me/climaoweatherbot',
                        'bg_color': 'rgb(255,82,82)',
-                       'icon': 'android'};
-      works_data[1] = {'title': 'Diligeiro',
+                       'icon': 'android'});
+      works_data.push({'title': 'Diligeiro',
                        'button_text': 'Conheça',
                        'description': 'Uber dos correspondentes jurídicos!<br>Job: Desenvolvimento de sistema, API e WebApp.',
-                       'href': 'http://diligeiro.com.br'};
-      works_data[0] = {'title': 'SeuProcesso',
+                       'href': 'http://diligeiro.com.br',
+                       'icon': 'add_location'});
+      works_data.push({'title': 'SeuProcesso',
                        'button_text': 'Conheça',
                        'description': 'Acompanhe processos jurídicos.<br>Job: Desenvolvimento de API e WebApp.',
                        'href': 'http://seuprocesso.com',
-                       'bg_color': '#0c6901'};
+                       'bg_color': '#0c6901',
+                       'icon': 'notifications_active'});
+      works_data.push({'title': 'LegalNote',
+                       'button_text': 'Conheça',
+                       'description': 'Acompanhe processos jurídicos.<br>Job: Manutenção e desenvolvimento de novas features.',
+                       'href': 'http://legalnote.com.br',
+                       'bg_color': '#ee6a54',
+                       'icon': 'business'});
+      works_data.push({'title': 'ClienterCMS',
+                       'button_text': '2015-2016',
+                       'description': 'Sistema de gestão de conteúdo para sites de PMEs. Usado para diversos sites.',
+                       'href': 'javascript:void(0)',
+                       'bg_color': 'rgb(253, 155, 7)',
+                       'icon': 'view_compact'});
+      works_data.push({'title': 'SGH',
+                       'button_text': '2012 - 2014',
+                       'description': 'Job: Treinamento de equipe e reformulação do sistema de gestão hospitalar do Hospital São Paulo.',
+                       'href': 'javascript:void(0)',
+                       'bg_color': '#2d56ac',
+                       'icon': 'local_hospital'});
 
       var links = new Array();
 
